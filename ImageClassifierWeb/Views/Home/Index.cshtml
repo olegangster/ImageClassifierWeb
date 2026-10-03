@@ -1,0 +1,49 @@
+@model ResultViewModel
+@{
+    ViewData["Title"] = "AI Image Classifier";
+}
+
+<h1>🤖 AI Image Classifier</h1>
+<div class="sub">Класифікація зображень локальною моделлю ML.NET (MLModel1)</div>
+
+<form class="card" method="post" enctype="multipart/form-data" onsubmit="document.getElementById('go').disabled = true; document.getElementById('go').innerText = 'Аналізую…';">
+    <div class="field">
+        <label for="file">Файл із зображенням</label>
+        <input id="file" type="file" name="file" accept="image/png,image/jpeg,image/gif" />
+    </div>
+    <div class="field">
+        <label for="url">або пряме посилання на зображення</label>
+        <input id="url" type="url" name="url" placeholder="https://site.com/photo.jpg" />
+    </div>
+    <button id="go" type="submit">Класифікувати</button>
+</form>
+
+@if (!string.IsNullOrEmpty(Model.Error))
+{
+    <div class="card err">❌ @Model.Error</div>
+}
+else if (Model.Top.Count > 0)
+{
+    var best = Model.Top[0];
+    <div class="card">
+        @if (Model.ImageDataUrl != null)
+        {
+            <img class="preview" src="@Model.ImageDataUrl" alt="Завантажене зображення" />
+        }
+        <div class="muted">Результат класифікації</div>
+        <div class="big">@best.Key</div>
+        <div>Впевненість моделі: <b>@best.Value.ToString("P1")</b></div>
+        <div class="bar"><div style="width:@((best.Value * 100).ToString("0.0", System.Globalization.CultureInfo.InvariantCulture))%"></div></div>
+
+        <b>Топ-3</b>
+        @foreach (var r in Model.Top)
+        {
+            <div class="row"><span>@r.Key</span><span>@r.Value.ToString("P1")</span></div>
+            <div class="bar"><div style="width:@((r.Value * 100).ToString("0.0", System.Globalization.CultureInfo.InvariantCulture))%"></div></div>
+        }
+
+        <div class="muted">Джерело: @Model.Source · час: @Model.ElapsedMs мс · розмір: @((Model.SizeBytes / 1024.0).ToString("0.0")) КБ</div>
+    </div>
+}
+
+<div class="muted">Також доступний API: <code>POST /api/classify</code> (поле <code>file</code> або <code>url</code>).</div>

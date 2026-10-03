@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="ImageClassifierWeb/ImageClassifierWeb.csproj" />
+  <Project Path="ModelTools/ModelTools.csproj" />
+</Solution>
